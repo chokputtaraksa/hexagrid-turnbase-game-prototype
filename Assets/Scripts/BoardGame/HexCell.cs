@@ -31,4 +31,14 @@ public class HexCell : MonoBehaviour
             }
         }
     }
+
+    public List<Vector3Int> GetAdjacentCells()
+    {
+        List<Vector3Int> returnList = new List<Vector3Int>();
+        foreach (HexCell cell in adjacentCells)
+        {
+            returnList.Add(cell.gridPosition);
+        }
+        return returnList;
+    }
 }

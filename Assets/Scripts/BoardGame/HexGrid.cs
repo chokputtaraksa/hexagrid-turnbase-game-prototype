@@ -1,15 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 
 public class HexGrid : MonoBehaviour
 {
-    public int width = 10;
-    public int height = 10;
     public float cellSize = 1f;
     public GameObject hexCellPrefab;
     // public GameObject player;
-    public bool isReady = false;
 
     private Dictionary<Vector3Int, HexCell> cells = new Dictionary<Vector3Int, HexCell>();
     private Dictionary<Vector3Int, GameObject> cellObjects = new Dictionary<Vector3Int, GameObject>();
@@ -20,12 +18,7 @@ public class HexGrid : MonoBehaviour
         new Vector3Int(-1, 0, 1), new Vector3Int(-1, 1, 0), new Vector3Int(0, 1, -1)
     };
 
-    void Start()
-    {
-        GenerateGrid();
-    }
-
-    void GenerateGrid()
+    public void Initialize(int width, int height)
     {
         for (int q = 0; q < width; q++)
         {
@@ -40,7 +33,6 @@ public class HexGrid : MonoBehaviour
         {
             cell.FindAdjacentCells();
         }
-        isReady = true;
     }
 
     void CreateCell(Vector3Int gridPos)
@@ -74,19 +66,33 @@ public class HexGrid : MonoBehaviour
         return null;
     }
 
-    public void HightLightWalkableCells(Vector3Int currentPos)
+    public void HighlightWalkableCells(Vector3Int startPos, int stamina)
     {
-        GameObject adjacentCell = cellObjects[currentPos];
+        Queue<Vector3Int> cellsToCheck = new Queue<Vector3Int>();
+        HashSet<Vector3Int> visitedCells = new HashSet<Vector3Int>();
 
-        MeshRenderer gameObjectRenderer = adjacentCell.GetComponent<MeshRenderer>();
+        cellsToCheck.Enqueue(startPos);
+        visitedCells.Add(startPos);
 
-        Material newMaterial = new Material(Shader.Find("Transparent/Diffuse"))
+        while (cellsToCheck.Count > 0 && stamina > 0)
         {
-            color = Color.green
-        };
-        gameObjectRenderer.material = newMaterial;
-        int layerIndex = LayerMask.NameToLayer("Tile");
-        adjacentCell.layer = layerIndex;
+            int cellsInCurrentLevel = cellsToCheck.Count;
+            for (int i = 0; i < cellsInCurrentLevel; i++)
+            {
+                Vector3Int currentPos = cellsToCheck.Dequeue();
+                HighlightCell(currentPos);
+
+                foreach (Vector3Int neighbor in GetNeighbors(currentPos))
+                {
+                    if (!visitedCells.Contains(neighbor) && IsCellWalkable(neighbor))
+                    {
+                        cellsToCheck.Enqueue(neighbor);
+                        visitedCells.Add(neighbor);
+                    }
+                }
+            }
+            stamina--;
+        }
     }
 
     public void ResetHightLightCells(Vector3Int currentPos)
@@ -102,5 +108,31 @@ public class HexGrid : MonoBehaviour
         gameObjectRenderer.material = newMaterial;
         int layerIndex = LayerMask.NameToLayer("Default");
         adjacentCell.layer = layerIndex;
+    }
+
+    private void HighlightCell(Vector3Int pos)
+    {
+        if (cellObjects.TryGetValue(pos, out GameObject cell))
+        {
+            MeshRenderer renderer = cell.GetComponent<MeshRenderer>();
+            Material newMaterial = new Material(Shader.Find("Transparent/Diffuse"))
+            {
+                color = new Color(0, 1, 0, 0.5f) // Semi-transparent green
+            };
+            renderer.material = newMaterial;
+            cell.layer = LayerMask.NameToLayer("Tile");
+        }
+    }
+
+    private List<Vector3Int> GetNeighbors(Vector3Int pos)
+    {
+        return cells[pos].GetAdjacentCells();
+    }
+
+    private bool IsCellWalkable(Vector3Int pos)
+    {
+        // Implement this method to check if a cell is walkable
+        // (e.g., not occupied by an obstacle)
+        return true; // Placeholder
     }
 }

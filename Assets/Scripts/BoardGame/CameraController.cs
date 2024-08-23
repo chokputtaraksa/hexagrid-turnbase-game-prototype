@@ -2,24 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainCamera : MonoBehaviour
+public class CameraController : MonoBehaviour
 {
+    // for set the camera focus
+    public float smoothTime = 0.3f;
+    public Vector3 offset = new Vector3(0, 10, -5); // Adjust this to your needs
+
+    private Vector3 velocity = Vector3.zero;
+    private Transform target;
+
+    // for camera movement
     public float moveSpeed = 10;
-    public GameObject player;
-    private Vector3 offset = new Vector3(0, 5, -6);
-    private List<HexCell> adjacentCells = new List<HexCell>();
     private float verticalInput;
     private float horizontalInput;
     private float scrollInput;
 
-    private float mouseClickDragInput;
-
-    // Start is called before the first frame update
-    void Start()
+    public void SetTarget(Transform newTarget)
     {
-
+        target = newTarget;
     }
-
 
     // Update is called once per frame
     void LateUpdate()
@@ -33,14 +34,24 @@ public class MainCamera : MonoBehaviour
         {
             transform.Translate(Vector3.forward * Time.deltaTime * (moveSpeed / 2) * verticalInput);
             transform.Translate(Vector3.up * Time.deltaTime * (moveSpeed / 2) * verticalInput);
+            target = null;
         }
         if (horizontalInput != 0)
         {
             transform.Translate(Vector3.right * Time.deltaTime * moveSpeed * horizontalInput);
+            target = null;
         }
         if (scrollInput != 0)
         {
             transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed * 30 * scrollInput);
+            target = null;
+        }
+
+        if (target != null)
+        {
+            Vector3 targetPosition = target.position + offset;
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+            transform.LookAt(target);
         }
     }
 
