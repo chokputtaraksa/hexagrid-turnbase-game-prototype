@@ -16,7 +16,6 @@ public class SettingManager : MonoBehaviour
         PlayerPrefs.SetString("BotNumber", botNumberInput.text);
         PlayerPrefs.SetString("xGrid", xGridNumberInput.text);
         PlayerPrefs.SetString("yGrid", yGridNumberInput.text);
-        Debug.Log("ClickHERE");
         // Load the game scene
         SceneManager.LoadScene("BoardGame");
     }

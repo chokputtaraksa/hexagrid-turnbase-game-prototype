@@ -7,13 +7,22 @@ public class HexCell : MonoBehaviour
     public List<HexCell> adjacentCells = new List<HexCell>();
     private HexGrid hexGrid;
 
-    public int usedStamina = 1;
+    public int requireAP = 1;
 
     public void Initialize(Vector3Int gridPos, HexGrid grid)
     {
+        gameObject.AddComponent<BoxCollider>();
         gridPosition = gridPos;
         hexGrid = grid;
         gameObject.AddComponent<BoxCollider>();
+    }
+
+    void OnMouseDown()
+    {
+        if (gameObject.layer == LayerMask.NameToLayer("WalkableGround"))
+        {
+            GameLogic.Instance.RequestMove(TurnManager.Instance.GetCurrentActor(), gridPosition);
+        }
     }
 
     public void FindAdjacentCells()

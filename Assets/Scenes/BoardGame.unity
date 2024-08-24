@@ -227,8 +227,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34cfb499e56078e4cab7fb2c3b2c5c02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  smoothTime: 0.3
+  offset: {x: 0, y: 10, z: -7}
   moveSpeed: 10
-  player: {fileID: 0}
 --- !u!1 &441904375
 GameObject:
   m_ObjectHideFlags: 0
@@ -396,8 +397,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3c8646150b27e544a429d6463fa7e33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  players: []
-  bots: []
+  dice: {fileID: 1088881966}
+  focusPlayer: 1
+  currentActorIndex: 0
   turnCount: 1
 --- !u!4 &754981662
 Transform:
@@ -414,63 +416,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &874204755
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 874204756}
-  - component: {fileID: 874204757}
-  m_Layer: 0
-  m_Name: Player
-  m_TagString: Player
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &874204756
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 874204755}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.8047663, y: 0.9113628, z: -16.952963}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &874204757
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 874204755}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49bfbb704014af149bb6df399da93711, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turnManager: {fileID: 754981661}
-  mainCamera: {fileID: 0}
-  currentCell: {fileID: 0}
-  hexGrid: {fileID: 0}
-  stamina: 0
-  PlayerPrefab: {fileID: 0}
-  selectableLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  movableTiles:
-    serializedVersion: 2
-    m_Bits: 0
-  isToggle: 0
 --- !u!1 &1088881964
 GameObject:
   m_ObjectHideFlags: 0
@@ -480,6 +425,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1088881965}
+  - component: {fileID: 1088881966}
   m_Layer: 0
   m_Name: DiceRoller
   m_TagString: Untagged
@@ -502,6 +448,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1088881966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1088881964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8378655877a78564581fc5576beef6f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfSides: 6
+  rollSpeed: 5
 --- !u!1 &1272402631
 GameObject:
   m_ObjectHideFlags: 0
@@ -548,7 +508,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cellSize: 1
   hexCellPrefab: {fileID: 919132149155446097, guid: 6a81166fbb89a7a4ea719861ed855234, type: 3}
-  isReady: 0
+  startingPositions: []
 --- !u!1 &1423314908
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,8 +539,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hexGridPrefab: {fileID: 1272402631}
-  playerPrefab: {fileID: 0}
-  botPrefab: {fileID: 0}
+  defaultPlayerPrefab: {fileID: 5939373887799106781, guid: b4b4bf1867eac3041a3dba9a15dd0580, type: 3}
+  defaultBotPrefab: {fileID: 4689317184242908741, guid: d431521bce934244eb3f2fb538a8bdf1, type: 3}
 --- !u!4 &1423314910
 Transform:
   m_ObjectHideFlags: 0
@@ -607,4 +567,3 @@ SceneRoots:
   - {fileID: 654672108}
   - {fileID: 1423314910}
   - {fileID: 179332033}
-  - {fileID: 874204756}

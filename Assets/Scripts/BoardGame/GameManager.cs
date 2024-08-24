@@ -5,10 +5,12 @@ public class GameManager : MonoBehaviour
 {
 
     public static GameManager Instance { get; private set; }
-    public int PlayerNumber { get; private set; }
-    public int BotNumber { get; private set; }
-    public int GridSizeX { get; private set; }
-    public int GridSizeY { get; private set; }
+    public int PlayerNumber { get; private set; } = 1;
+    public int BotNumber { get; private set; } = 1;
+    public int GridSizeX { get; private set; } = 10;
+    public int GridSizeY { get; private set; } = 10;
+    // public PlayerSkin[] SelectedSkins { get; private set; }
+    public BotDifficulty botDifficulty { get; private set; } = BotDifficulty.Normal;
 
     private void Awake()
     {

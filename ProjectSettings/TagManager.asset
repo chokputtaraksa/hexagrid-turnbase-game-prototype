@@ -11,9 +11,9 @@ TagManager:
   - Player
   - Water
   - UI
-  - Tile
-  - 
-  - 
+  - WalkableGround
+  - Ground
+  - AttackGround
   - 
   - 
   - 

@@ -6,7 +6,7 @@ public class CameraController : MonoBehaviour
 {
     // for set the camera focus
     public float smoothTime = 0.3f;
-    public Vector3 offset = new Vector3(0, 10, -5); // Adjust this to your needs
+    public Vector3 offset = new Vector3(0, 10, -7); // Adjust this to your needs
 
     private Vector3 velocity = Vector3.zero;
     private Transform target;
@@ -20,6 +20,7 @@ public class CameraController : MonoBehaviour
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
+        transform.rotation = Quaternion.Euler(60, 6, 0);
     }
 
     // Update is called once per frame
@@ -32,7 +33,7 @@ public class CameraController : MonoBehaviour
         scrollInput = Input.GetAxis("Mouse ScrollWheel");
         if (verticalInput != 0)
         {
-            transform.Translate(Vector3.forward * Time.deltaTime * (moveSpeed / 2) * verticalInput);
+            transform.Translate(Vector3.forward * Time.deltaTime * (moveSpeed / 4) * verticalInput);
             transform.Translate(Vector3.up * Time.deltaTime * (moveSpeed / 2) * verticalInput);
             target = null;
         }
@@ -51,9 +52,6 @@ public class CameraController : MonoBehaviour
         {
             Vector3 targetPosition = target.position + offset;
             transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
-            transform.LookAt(target);
         }
     }
-
-
 }
