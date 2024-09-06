@@ -17,7 +17,7 @@ public class GameLogic : MonoBehaviour
 
     public bool RequestMove(Actor actor, Vector3Int newGridPosition)
     {
-        if (HexGrid.Instance.IsCellOccupied(newGridPosition))
+        if (!HexGrid.Instance.IsCellWalkable(newGridPosition, true))
         {
             Debug.LogWarning("Cannot move to occupied cell");
             return false;
@@ -27,18 +27,16 @@ public class GameLogic : MonoBehaviour
 
     public void HandleAttackCommand(Actor attacker, Actor defender)
     {
-
-        if (defender != null && defender != attacker)
-        {
-            bool attackSuccessful = CombatSystem.Instance.PerformAttack(attacker, defender);
-            if (attackSuccessful)
-            {
-                // @TODO log something or make some action
-            }
-        }
-        else
+        if (defender == null || defender == attacker)
         {
             Debug.Log("Invalid attack target!");
+            return;
+        }
+
+        bool attackSuccessful = CombatSystem.Instance.PerformAttack(attacker, defender);
+        if (attackSuccessful)
+        {
+            // @TODO log something or make some action
         }
     }
 }

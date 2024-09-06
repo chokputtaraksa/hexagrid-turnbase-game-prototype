@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 
 public class HexGrid : MonoBehaviour
@@ -81,7 +82,7 @@ public class HexGrid : MonoBehaviour
     }
 
     // Check are there any enemy, impassable terrain in this cell
-    public bool IsCellOccupied(Vector3Int gridPosition)
+    public bool IsCellOccupiedByPlayer(Vector3Int gridPosition)
     {
         return occupiedCells.ContainsKey(gridPosition);
     }
@@ -153,8 +154,8 @@ public class HexGrid : MonoBehaviour
             if (startingPositions.Count < numberOfPositions)
             {
                 Vector3Int randomPos = new Vector3Int(
-                    Random.Range(0, width),
-                    Random.Range(0, height),
+                    UnityEngine.Random.Range(0, width),
+                    UnityEngine.Random.Range(0, height),
                     0
                 );
 
@@ -177,10 +178,23 @@ public class HexGrid : MonoBehaviour
         return Vector3.zero; // Return a default position if the cell doesn't exist
     }
 
+    public int GetDistant(Vector3Int startPos, Vector3Int desPos)
+    {
+        // this logic will get the distant from a to b
+        if (startPos.x - desPos.x > 0 && startPos.z - desPos.z < 0 || startPos.x - desPos.x < 0 && startPos.z - desPos.z > 0)
+        {
+            return Mathf.Abs(startPos.x - desPos.x) + Mathf.Abs(startPos.z - desPos.z);
+        }
+        else
+        {
+            return Mathf.Max(Mathf.Abs(startPos.x - desPos.x), Mathf.Abs(startPos.z - desPos.z));
+        }
+    }
+
     public Dictionary<Vector3Int, int> GetReachableCells(Vector3Int startPos, int initialActionPoints)
     {
-        Queue<(Vector3Int, int)> cellsToCheck = new Queue<(Vector3Int, int)>();
-        Dictionary<Vector3Int, int> reachableCells = new Dictionary<Vector3Int, int>();
+        Queue<(Vector3Int, int)> cellsToCheck = new();
+        Dictionary<Vector3Int, int> reachableCells = new();
 
         cellsToCheck.Enqueue((startPos, initialActionPoints));
         reachableCells[startPos] = 0;
@@ -198,7 +212,7 @@ public class HexGrid : MonoBehaviour
                 int totalCost = reachableCells[currentPos] + costToEnter;
                 int newRemainingAP = remainingAP - costToEnter;
 
-                if (newRemainingAP >= 0 && IsCellWalkable(neighbor))
+                if (newRemainingAP >= 0)
                 {
                     if (!reachableCells.ContainsKey(neighbor) || totalCost < reachableCells[neighbor])
                     {
@@ -237,7 +251,7 @@ public class HexGrid : MonoBehaviour
         {
             // just check if the cell is occupied in something
             // @TODO Add terrain and item/ separate them and Actor
-            if (IsCellOccupied(pos))
+            if (IsCellOccupiedByPlayer(pos))
             {
                 MeshRenderer renderer = cell.GetComponent<MeshRenderer>();
                 Material newMaterial = new Material(Shader.Find("Transparent/Diffuse"))
@@ -262,7 +276,7 @@ public class HexGrid : MonoBehaviour
         }
     }
 
-    private List<Vector3Int> GetNeighbors(Vector3Int pos)
+    public List<Vector3Int> GetNeighbors(Vector3Int pos)
     {
         return cells[pos].GetAdjacentCells();
     }
@@ -272,11 +286,15 @@ public class HexGrid : MonoBehaviour
         return cells[pos].requireAP;
     }
 
-    private bool IsCellWalkable(Vector3Int pos)
+    public bool IsCellWalkable(Vector3Int pos, bool includeActor)
     {
         // @TODO in case of unpassable terrain
         // Implement this method to check if a cell is walkable
         // (e.g., not occupied by an obstacle)
+        if (IsCellOccupiedByPlayer(pos) && includeActor)
+        {
+            return false;
+        }
         return true; // Placeholder
     }
 
@@ -290,7 +308,6 @@ public class HexGrid : MonoBehaviour
         while (openSet.Count > 0)
         {
             var current = openSet.OrderBy(pos => fScore.GetValueOrDefault(pos, int.MaxValue)).First();
-
             if (current == endPos)
                 return ReconstructPath(cameFrom, current);
 
@@ -298,7 +315,7 @@ public class HexGrid : MonoBehaviour
 
             foreach (var neighbor in GetNeighbors(current))
             {
-                if (!IsCellWalkable(neighbor)) continue;
+                if (!IsCellWalkable(neighbor, false)) continue;
 
                 var tentativeGScore = gScore[current] + GetActionPoint(neighbor);
                 if (tentativeGScore < gScore.GetValueOrDefault(neighbor, int.MaxValue))
@@ -336,7 +353,6 @@ public class HexGrid : MonoBehaviour
     public (int, List<Vector3Int>) GetShortestPathCost(Vector3Int startPos, Vector3Int endPos)
     {
         var path = FindShortestPath(startPos, endPos);
-
         if (path == null)
         {
             Debug.Log("No valid path found.");
@@ -353,18 +369,9 @@ public class HexGrid : MonoBehaviour
 
     public int TryMovePlayerAndGetPathCost(Vector3Int startPos, Vector3Int endPos, int stamina)
     {
-        int playerStamina = stamina;
-        var reachableCells = GetReachableCells(startPos, playerStamina);
-
-        if (!reachableCells.ContainsKey(endPos))
-        {
-            Debug.Log($"Clicked cell is not reachable with current stamina. {stamina}");
-            return -1;
-        }
-
         (int totalCost, List<Vector3Int> path) = GetShortestPathCost(startPos, endPos);
 
-        if (totalCost > playerStamina)
+        if (totalCost > stamina)
         {
             Debug.Log("Not enough stamina to reach the clicked cell.");
             return -1;
@@ -378,10 +385,7 @@ public class HexGrid : MonoBehaviour
             // @TODO illusion of player to the new position
         }
 
-        // Update player's stamina
-        playerStamina -= totalCost;
-
-        Debug.Log($"Player moved to {endPos}. Remaining stamina: {playerStamina}");
+        // Debug.Log($"Player moved to {endPos}. Remaining stamina: {playerStamina}");
         return totalCost;
     }
 }

@@ -40,24 +40,23 @@ public class GameInitializer : MonoBehaviour
         int totalActors = GameManager.Instance.PlayerNumber + GameManager.Instance.BotNumber;
         for (int i = 0; i < totalActors; i++)
         {
-            string objectName;
-            GameObject actorPrefab;
 
             if (i < GameManager.Instance.PlayerNumber)
             {
-                actorPrefab = defaultPlayerPrefab;
-                objectName = "Player-" + i;
+                GameObject actorObject = Instantiate(defaultPlayerPrefab);
+                actorObject.name = "Player-" + i;
+                Actor actor = actorObject.GetComponent<Actor>();
+                actor.Initialize(i);
+                TurnManager.Instance.RegisterActor(actor);
             }
             else
             {
-                actorPrefab = defaultBotPrefab;
-                objectName = "Bot-" + i;
+                GameObject actorObject = Instantiate(defaultBotPrefab);
+                actorObject.name = "Bot-" + i;
+                Bot actor = actorObject.GetComponent<Bot>();
+                actor.Initialize(i, GameManager.Instance.botDifficulty);
+                TurnManager.Instance.RegisterActor(actor);
             }
-            GameObject actorObject = Instantiate(actorPrefab);
-            actorObject.name = objectName;
-            Actor actor = actorObject.GetComponent<Actor>();
-            actor.Initialize(i);
-            TurnManager.Instance.RegisterActor(actor);
         }
     }
 }

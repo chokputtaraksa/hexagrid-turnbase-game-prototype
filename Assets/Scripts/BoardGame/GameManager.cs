@@ -31,5 +31,7 @@ public class GameManager : MonoBehaviour
         BotNumber = int.Parse(PlayerPrefs.GetString("BotNumber", "1"));
         GridSizeX = int.Parse(PlayerPrefs.GetString("xGrid", "20"));
         GridSizeY = int.Parse(PlayerPrefs.GetString("yGrid", "20"));
+        string difficulty = PlayerPrefs.GetString("difficulty", BotDifficulty.Normal.ToString());
+        botDifficulty = (BotDifficulty)Enum.Parse(typeof(BotDifficulty), difficulty);
     }
 }

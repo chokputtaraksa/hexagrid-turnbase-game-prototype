@@ -19,9 +19,21 @@ public class CombatSystem : MonoBehaviour
     public bool PerformAttack(Actor attacker, Actor defender)
     {
         // @TODO damage should calculate from Weapon and Equipment
-        int damage = 40;
+        int damage = 5;
         // @TODO use stamina depend on weapon
         int usedStamina = 2;
+        if (!defender.CanBeAttacked(attacker.CurrentPosition))
+        {
+            Debug.Log("You are too far away from the enemy, move close to them before Attack");
+            return false;
+        }
+        if (attacker.Stamina < usedStamina)
+        {
+
+            Debug.Log("No stamina to attack");
+            return false;
+        }
+
         bool attackSuccess = attacker.Attack(defender, damage, usedStamina);
         if (!attackSuccess)
         {
