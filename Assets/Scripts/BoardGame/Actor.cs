@@ -6,20 +6,22 @@ public abstract class Actor : MonoBehaviour
 {
     public int ActorId { get; protected set; }
     public bool IsBot { get; protected set; }
+    public bool IsMyTurn { get; protected set; }
     public Vector3Int CurrentPosition { get; set; }
     public int Stamina { get; protected set; }
     [SerializeField] protected int maxHP = 10;
     public int CurrentHP { get; protected set; }
 
     public event Action<Actor> OnActorDeath;
+    public int AttackRange = 1;
 
     public virtual void Initialize(int id)
     {
         ActorId = id;
         CurrentPosition = HexGrid.Instance.startingPositions[id];
-        MoveToGridPosition(CurrentPosition);
         CurrentHP = maxHP;
         OnActorDeath = TurnManager.Instance.HandleActorDeath;
+        HexGrid.Instance.OccupyCell(CurrentPosition, this);
     }
     public abstract void StartTurn(int actionPoint);
     public abstract void EndTurn();
@@ -34,6 +36,11 @@ public abstract class Actor : MonoBehaviour
         HexGrid.Instance.VacateCell(CurrentPosition);
         // move the player back
         Vector3Int moveBackVector = attacker.CurrentPosition - CurrentPosition;
+        if (HexGrid.Instance.GetCellAtGridPosition(CurrentPosition - moveBackVector) == null)
+        {
+            Die();
+            CurrentHP = 0;
+        }
         CurrentPosition -= moveBackVector;
         // reserve the position
         if (CurrentHP > 0)
@@ -55,6 +62,7 @@ public abstract class Actor : MonoBehaviour
     {
         OnActorDeath?.Invoke(this);
         Destroy(gameObject);
+        IsMyTurn = false;
     }
 
     protected virtual void RemoveFromGrid()
@@ -64,14 +72,8 @@ public abstract class Actor : MonoBehaviour
 
     public virtual bool CanBeAttacked(Vector3Int attackerPos)
     {
-        Vector3Int distant = attackerPos - CurrentPosition;
+        int distant = HexGrid.Instance.GetDistant(attackerPos, CurrentPosition);
         // only if the attacker is in 1 space away from this actor can attack
-        return Math.Abs(distant.x) <= 1 && Math.Abs(distant.y) <= 1 && Math.Abs(distant.z) <= 1;
-    }
-
-    public virtual void MoveToGridPosition(Vector3Int newGridPosition)
-    {
-        Vector3 worldInitPos = HexGrid.Instance.GridToWorldPosition(CurrentPosition);
-        transform.position = new Vector3(worldInitPos.x, worldInitPos.y + 0.5f, worldInitPos.z);
+        return distant <= AttackRange;
     }
 }

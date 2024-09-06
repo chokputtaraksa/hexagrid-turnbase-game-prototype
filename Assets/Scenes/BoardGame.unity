@@ -539,7 +539,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hexGridPrefab: {fileID: 1272402631}
-  defaultPlayerPrefab: {fileID: 5939373887799106781, guid: b4b4bf1867eac3041a3dba9a15dd0580, type: 3}
+  defaultPlayerPrefab: {fileID: 7301346320214894098, guid: 3d3c430ef273fd94b91764dd3415512c, type: 3}
   defaultBotPrefab: {fileID: 4689317184242908741, guid: d431521bce934244eb3f2fb538a8bdf1, type: 3}
 --- !u!4 &1423314910
 Transform:

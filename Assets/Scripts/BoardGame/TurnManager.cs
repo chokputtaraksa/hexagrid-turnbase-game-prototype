@@ -11,6 +11,7 @@ public class TurnManager : MonoBehaviour
     public int currentActorIndex = 0;
     private List<Actor> actors = new List<Actor>();
     public int turnCount = 1;
+    private bool isEndGame = false;
 
     private void Awake()
     {
@@ -47,7 +48,7 @@ public class TurnManager : MonoBehaviour
 
     public void StartNextTurn()
     {
-        if (actors.Count == 0) return;
+        if (actors.Count <= 1 || isEndGame) return;
         int index = currentActorIndex % actors.Count;
         SetCurrentPlayer(index);
     }
@@ -98,6 +99,12 @@ public class TurnManager : MonoBehaviour
         return actors;
     }
 
+    public List<Actor> GetEnemyActors()
+    {
+        // @TODO if there is team, this function should be implemented
+        return actors;
+    }
+
     public bool IsMyTurn(Actor actor)
     {
         int index = currentActorIndex % actors.Count;
@@ -127,6 +134,8 @@ public class TurnManager : MonoBehaviour
     private void EndGame()
     {
         Debug.Log("Game Over!");
+        isEndGame = true;
+        EndTurn();
         // Implement your game over logic here
     }
 }
